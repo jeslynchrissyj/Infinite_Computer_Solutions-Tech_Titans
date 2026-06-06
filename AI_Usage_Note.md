@@ -1,6 +1,6 @@
 # AI Collaboration & Usage Note
 
-This document summarizes the interaction and collaboration with Antigravity (AI coding assistant) during the design, development, testing, and deployment of the **RAG Chat API**.
+This document summarizes the interaction and collaboration with Antigravity (AI coding assistant) during the design, development, testing, and deployment of the **RAG Chat API** (Live Demo: [https://rag-chat-api-dotnet.onrender.com/swagger](https://rag-chat-api-dotnet.onrender.com/swagger)).
 
 ---
 
