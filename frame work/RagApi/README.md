@@ -1,6 +1,6 @@
 # 🤖 RAG Chat API — ASP.NET Core 8
 
-A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.NET Core 8 Minimal APIs. Ask natural-language questions and get answers grounded in your local Markdown documents, powered by Ollama (llama3 + nomic-embed-text) or OpenAI.
+A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.NET Core 8 Minimal APIs. Ask natural-language questions and get answers grounded in your local Markdown documents, powered by Ollama (qwen2:1.5b + nomic-embed-text) or OpenAI.
 
 ### 🌐 Deployed Live Links
 * **Live Swagger UI (Interactive Playground)**: [https://rag-chat-api-dotnet.onrender.com/swagger](https://rag-chat-api-dotnet.onrender.com/swagger)
@@ -33,7 +33,7 @@ A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.N
                     ┌─────────▼───────────────────────▼────────┐
                     │              Ollama (localhost:11434)      │
                     │  ┌──────────────┐  ┌──────────────────┐  │
-                    │  │ nomic-embed  │  │     llama3       │  │
+                    │  │ nomic-embed  │  │   qwen2:1.5b     │  │
                     │  │   -text      │  │                  │  │
                     │  └──────────────┘  └──────────────────┘  │
                     └──────────────────────────────────────────┘
@@ -51,10 +51,10 @@ User Question
 └─────────────┘     └─────────────┘     └──────┬──────┘
                                                │
                                                ▼
-                                        ┌─────────────┐
-                                        │  LLM Call   │
-                                        │  (llama3)   │
-                                        └──────┬──────┘
+                                         ┌─────────────┐
+                                         │  LLM Call   │
+                                         │(qwen2:1.5b) │
+                                         └──────┬──────┘
                                                │
                                                ▼
                                         ┌─────────────┐
@@ -73,7 +73,7 @@ User Question
 ### Install Required Ollama Models
 
 ```bash
-ollama pull llama3
+ollama pull qwen2:1.5b
 ollama pull nomic-embed-text
 ```
 
@@ -198,7 +198,7 @@ All settings are in `appsettings.json`:
 | `LlmProvider` | `"Ollama"` | LLM provider (`Ollama` or `OpenAI` in the future) |
 | `Ollama:BaseUrl` | `http://localhost:11434` | Ollama server URL |
 | `Ollama:EmbeddingModel` | `nomic-embed-text` | Model for embedding generation |
-| `Ollama:ChatModel` | `llama3` | Model for text generation |
+| `Ollama:ChatModel` | `qwen2:1.5b` | Model for text generation |
 | `Rag:DocumentsPath` | `Documents` | Path to Markdown knowledge base |
 | `Rag:ChunkSize` | `500` | Max characters per chunk |
 | `Rag:ChunkOverlap` | `50` | Overlap between consecutive chunks |
