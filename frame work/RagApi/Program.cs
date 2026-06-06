@@ -91,10 +91,15 @@ else if (llmProvider.Equals("OpenAI", StringComparison.OrdinalIgnoreCase))
         client.Timeout = TimeSpan.FromMinutes(2);
     });
 }
+else if (llmProvider.Equals("Mock", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddSingleton<IEmbeddingService, MockEmbeddingService>();
+    builder.Services.AddSingleton<ILlmService, MockLlmService>();
+}
 else
 {
     throw new InvalidOperationException(
-        $"LLM provider '{llmProvider}' is not supported. Currently supported: Ollama, OpenAI.");
+        $"LLM provider '{llmProvider}' is not supported. Currently supported: Ollama, OpenAI, Mock.");
 }
 
 // ── Application Services ─────────────────────────────────────
