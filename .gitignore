@@ -1,0 +1,16 @@
+# Build folders
+[Db]in/
+[Oo]bj/
+
+# IDE/Editor folders
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
