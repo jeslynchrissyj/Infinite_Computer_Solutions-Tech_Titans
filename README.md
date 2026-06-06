@@ -2,6 +2,10 @@
 
 A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.NET Core 8 Minimal APIs. Ask natural-language questions and get answers grounded in your local Markdown documents, powered by Ollama (llama3 + nomic-embed-text) or OpenAI.
 
+### 🌐 Live Demo URLs
+* **Live Swagger UI (Interactive Playground)**: [https://rag-chat-api-dotnet.onrender.com/swagger](https://rag-chat-api-dotnet.onrender.com/swagger)
+* **Live API Health Check**: [https://rag-chat-api-dotnet.onrender.com/health](https://rag-chat-api-dotnet.onrender.com/health)
+
 ---
 
 ## 📦 Submission Package Deliverables
