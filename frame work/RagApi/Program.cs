@@ -98,6 +98,7 @@ else
 }
 
 // ── Application Services ─────────────────────────────────────
+builder.Services.AddSingleton<IndexingStatus>();
 builder.Services.AddSingleton<DocumentLoaderService>();
 builder.Services.AddSingleton<TextChunkingService>();
 builder.Services.AddSingleton<VectorStoreService>();
@@ -126,14 +127,20 @@ app.UseSwaggerUI(options =>
 // ──────────────────────────────────────────────────────────────
 
 // Health check endpoint.
-app.MapGet("/health", (VectorStoreService vectorStore, IConfiguration config) =>
+app.MapGet("/health", (VectorStoreService vectorStore, IConfiguration config, IndexingStatus indexingStatus) =>
 {
     return Results.Ok(new
     {
         Status = "Healthy",
         Timestamp = DateTime.UtcNow,
         IndexedChunks = vectorStore.Count,
-        LlmProvider = config["LlmProvider"] ?? "Ollama"
+        LlmProvider = config["LlmProvider"] ?? "Ollama",
+        Indexing = new
+        {
+            indexingStatus.IsComplete,
+            indexingStatus.SuccessCount,
+            LastError = indexingStatus.LastError ?? "None"
+        }
     });
 })
 .WithName("HealthCheck")

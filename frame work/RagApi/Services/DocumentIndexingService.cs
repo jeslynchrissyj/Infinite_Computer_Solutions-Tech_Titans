@@ -13,6 +13,7 @@ public sealed class DocumentIndexingService : IHostedService
     private readonly TextChunkingService _textChunker;
     private readonly IEmbeddingService _embeddingService;
     private readonly VectorStoreService _vectorStore;
+    private readonly IndexingStatus _indexingStatus;
     private readonly ILogger<DocumentIndexingService> _logger;
 
     public DocumentIndexingService(
@@ -20,12 +21,14 @@ public sealed class DocumentIndexingService : IHostedService
         TextChunkingService textChunker,
         IEmbeddingService embeddingService,
         VectorStoreService vectorStore,
+        IndexingStatus indexingStatus,
         ILogger<DocumentIndexingService> logger)
     {
         _documentLoader = documentLoader;
         _textChunker = textChunker;
         _embeddingService = embeddingService;
         _vectorStore = vectorStore;
+        _indexingStatus = indexingStatus;
         _logger = logger;
     }
 
@@ -35,6 +38,10 @@ public sealed class DocumentIndexingService : IHostedService
     /// </summary>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        _indexingStatus.IsComplete = false;
+        _indexingStatus.SuccessCount = 0;
+        _indexingStatus.LastError = null;
+
         _logger.LogInformation("╔══════════════════════════════════════════════════╗");
         _logger.LogInformation("║    Document Indexing Service — Starting...       ║");
         _logger.LogInformation("╚══════════════════════════════════════════════════╝");
@@ -50,6 +57,7 @@ public sealed class DocumentIndexingService : IHostedService
             if (documents.Count == 0)
             {
                 _logger.LogWarning("No documents found to index. The API will start without a knowledge base.");
+                _indexingStatus.IsComplete = true;
                 return;
             }
 
@@ -87,6 +95,7 @@ public sealed class DocumentIndexingService : IHostedService
                     chunk.Embedding = await _embeddingService.GenerateEmbeddingAsync(chunk.Content, cancellationToken);
                     _vectorStore.AddChunk(chunk);
                     embeddedCount++;
+                    _indexingStatus.SuccessCount = embeddedCount;
 
                     if (embeddedCount % 10 == 0 || embeddedCount == allChunks.Count)
                     {
@@ -98,6 +107,7 @@ public sealed class DocumentIndexingService : IHostedService
                 {
                     _logger.LogError(ex, "Failed to embed chunk {Index} from '{Source}'",
                         chunk.ChunkIndex, chunk.Source);
+                    _indexingStatus.LastError = ex.Message;
                 }
             }
 
@@ -111,10 +121,16 @@ public sealed class DocumentIndexingService : IHostedService
         catch (OperationCanceledException)
         {
             _logger.LogWarning("Document indexing was cancelled during startup.");
+            _indexingStatus.LastError = "Document indexing was cancelled during startup.";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Document indexing failed. The API will start without a knowledge base.");
+            _indexingStatus.LastError = ex.Message;
+        }
+        finally
+        {
+            _indexingStatus.IsComplete = true;
         }
     }
 
