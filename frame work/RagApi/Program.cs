@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Net.Http.Headers;
 using RagApi.Models;
 using RagApi.Services;
 
@@ -22,7 +23,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "RAG Chat API",
         Version = "v1",
-        Description = "Retrieval-Augmented Generation API powered by ASP.NET Core 8 and Ollama. " +
+        Description = "Retrieval-Augmented Generation API powered by ASP.NET Core 8 and OpenAI/Ollama. " +
                       "Ask questions and get answers grounded in local Markdown documents.",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
@@ -59,14 +60,41 @@ if (llmProvider.Equals("Ollama", StringComparison.OrdinalIgnoreCase))
         client.Timeout = TimeSpan.FromMinutes(5); // LLM generation can take time
     });
 }
+else if (llmProvider.Equals("OpenAI", StringComparison.OrdinalIgnoreCase))
+{
+    var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
+    if (string.IsNullOrWhiteSpace(openAiApiKey))
+    {
+        openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+    }
+
+    if (string.IsNullOrWhiteSpace(openAiApiKey))
+    {
+        throw new InvalidOperationException(
+            "OpenAI API Key is missing. Please set it in 'appsettings.json' under 'OpenAI:ApiKey' " +
+            "or as an environment variable named 'OPENAI_API_KEY'.");
+    }
+
+    // Register HttpClient for OpenAIEmbeddingService
+    builder.Services.AddHttpClient<IEmbeddingService, OpenAIEmbeddingService>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.openai.com/");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", openAiApiKey);
+        client.Timeout = TimeSpan.FromMinutes(2);
+    });
+
+    // Register HttpClient for OpenAILlmService
+    builder.Services.AddHttpClient<ILlmService, OpenAILlmService>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.openai.com/");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", openAiApiKey);
+        client.Timeout = TimeSpan.FromMinutes(2);
+    });
+}
 else
 {
-    // Placeholder for future OpenAI support.
-    // To add OpenAI, create OpenAIEmbeddingService : IEmbeddingService
-    // and OpenAILlmService : ILlmService, then register them here.
     throw new InvalidOperationException(
-        $"LLM provider '{llmProvider}' is not yet supported. Currently supported: Ollama. " +
-        "To add OpenAI support, implement IEmbeddingService and ILlmService for OpenAI.");
+        $"LLM provider '{llmProvider}' is not supported. Currently supported: Ollama, OpenAI.");
 }
 
 // ── Application Services ─────────────────────────────────────
