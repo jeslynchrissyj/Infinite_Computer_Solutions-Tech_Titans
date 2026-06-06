@@ -1,0 +1,11 @@
+{
+  "status": "Healthy",
+  "timestamp": "2026-06-06T09:16:04.5455979Z",
+  "indexedChunks": 31,
+  "llmProvider": "OpenAI",
+  "indexing": {
+    "isComplete": true,
+    "successCount": 31,
+    "lastError": "None"
+  }
+}

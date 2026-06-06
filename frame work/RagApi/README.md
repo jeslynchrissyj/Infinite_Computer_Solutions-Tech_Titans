@@ -287,6 +287,37 @@ The architecture is designed for easy provider swapping:
 
 ---
 
+## Assumptions & Limitations
+
+### Assumptions
+* **Knowledge Base Source**: Markdown (`.md`) documents are assumed to be well-formed, UTF-8 encoded text.
+* **OpenAI Availability**: When `LlmProvider` is set to `OpenAI`, the host server must have outbound internet connectivity and a valid API key configured.
+* **Ollama Endpoint**: When running locally under the default `Ollama` provider, Ollama is assumed to be active on `http://localhost:11434` with the `qwen2:1.5b` and `nomic-embed-text` models pre-pulled.
+
+### Limitations
+* **In-Memory Store**: The vector store runs entirely in RAM. Restarting the API clears the index, which must then be re-built on startup.
+* **Parsing Complexity**: The document parser strips raw HTML and Markdown formatting. It does not extract images, handle complex tables, or retain mathematical notations.
+* **Local Latency**: Generating embeddings and responses on local CPU hardware via Ollama can be slow depending on system specifications.
+
+---
+
+## Unit Testing
+
+The project contains a test suite built with **xUnit** covering the core logic of text chunking, document loading, and cosine-similarity searches.
+
+### Run Tests
+To run the tests:
+1. Navigate to the test project directory:
+   ```bash
+   cd "frame work/RagApi.Tests"
+   ```
+2. Run the test command:
+   ```bash
+   dotnet test
+   ```
+
+---
+
 ## License
 
 This project is provided as an educational example of enterprise-grade RAG in .NET.

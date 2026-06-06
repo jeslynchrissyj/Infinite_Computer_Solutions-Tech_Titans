@@ -1,0 +1,8 @@
+{
+  "question": "What is dependency injection and what are the service lifetimes in ASP.NET Core?",
+  "answer": "Dependency injection is a software design pattern where dependencies between classes are represented by interfaces or abstract classes rather than concrete implementations. It promotes loose coupling, testability, and clean architecture patterns.\n\nIn ASP.NET Core, there are three service lifetimes:\n\n- Transient: Created each time they are requested.\n- Scoped: Created once per HTTP request (or scope).\n- Singleton: Created only once for the application instance or its lifetime.\n \nThese lifetimes promote loose coupling by allowing dependencies to be created and destroyed individually rather than requiring all services to have a shared state. This is particularly important in scenarios where different parts of an application may require access to different types of data but need to remain decoupled from each other, such as the service life cycle.\n\nFor more information on these concepts in ASP.NET Core, refer to the \"Dependency-Injection.md\" and \"aspnet-core-overview.md\" sources.",
+  "sources": [
+    "dependency-injection.md",
+    "aspnet-core-overview.md"
+  ]
+}
