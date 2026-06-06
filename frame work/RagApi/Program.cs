@@ -126,13 +126,14 @@ app.UseSwaggerUI(options =>
 // ──────────────────────────────────────────────────────────────
 
 // Health check endpoint.
-app.MapGet("/health", (VectorStoreService vectorStore) =>
+app.MapGet("/health", (VectorStoreService vectorStore, IConfiguration config) =>
 {
     return Results.Ok(new
     {
         Status = "Healthy",
         Timestamp = DateTime.UtcNow,
-        IndexedChunks = vectorStore.Count
+        IndexedChunks = vectorStore.Count,
+        LlmProvider = config["LlmProvider"] ?? "Ollama"
     });
 })
 .WithName("HealthCheck")
