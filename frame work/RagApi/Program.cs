@@ -215,6 +215,13 @@ app.MapPost("/chat", async (ChatRequest request, RagService ragService, ILogger<
 .Produces(400)
 .Produces(502);
 
+// Redirect root URL to Swagger UI
+app.MapGet("/", (HttpContext context) =>
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
+
 // ──────────────────────────────────────────────────────────────
 //  Run
 // ──────────────────────────────────────────────────────────────
