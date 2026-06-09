@@ -5,6 +5,7 @@ A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.N
 ### 🌐 Deployed Live Links
 * **Live Swagger UI (Interactive Playground)**: [https://rag-chat-api-dotnet.onrender.com/swagger](https://rag-chat-api-dotnet.onrender.com/swagger)
 * **Live API Health Check**: [https://rag-chat-api-dotnet.onrender.com/health](https://rag-chat-api-dotnet.onrender.com/health)
+* **Demo Video (Walkthrough)**: [Google Drive Demo Video Link](https://drive.google.com/drive/folders/1qTjh4l2N7K1RlY7CtfEiKxtvExsQBScW?usp=drive_link)
 
 ---
 

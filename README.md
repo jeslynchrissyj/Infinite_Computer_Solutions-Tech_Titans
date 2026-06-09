@@ -5,6 +5,7 @@ A production-ready **Retrieval-Augmented Generation (RAG)** API built with ASP.N
 ### 🌐 Live Demo URLs
 * **Live Swagger UI (Interactive Playground)**: [https://rag-chat-api-dotnet.onrender.com/swagger](https://rag-chat-api-dotnet.onrender.com/swagger)
 * **Live API Health Check**: [https://rag-chat-api-dotnet.onrender.com/health](https://rag-chat-api-dotnet.onrender.com/health)
+* **Demo Video (Walkthrough)**: [Google Drive Demo Video Link](https://drive.google.com/drive/folders/1qTjh4l2N7K1RlY7CtfEiKxtvExsQBScW?usp=drive_link)
 
 ---
 
@@ -15,6 +16,7 @@ This repository contains all technical deliverables required for the project sub
 2. **xUnit Tests**: Located in [frame work/RagApi.Tests](file:///frame%20work/RagApi.Tests) (9 tests covering semantic chunking, markdown parsing, and cosine similarity).
 3. **AI Usage Note**: Documented in [AI_Usage_Note.md](file:///AI_Usage_Note.md) at the repository root.
 4. **Sample Data**: Located in [sample_data/](file:///sample_data/) folder containing input documentation and expected JSON output payloads.
+5. **Demo Video**: Link provided in the [demo_video/](file:///demo_video/) folder and directly on [Google Drive](https://drive.google.com/drive/folders/1qTjh4l2N7K1RlY7CtfEiKxtvExsQBScW?usp=drive_link).
 
 ---
 
