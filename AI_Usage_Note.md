@@ -25,9 +25,4 @@ This document summarizes the interaction and collaboration with Antigravity (AI 
 * **Required Properties in Tests**: Initialized `DocumentChunk` items in test methods without setting the C# 11 `required` property `ChunkIndex`, resulting in compiler errors.
   * *Resolution*: Fixed the object initializers in the unit tests.
 
----
 
-## 3. Best Prompts Used
-* *"run the entire project and give me the output page"* — Allowed the AI to execute the program and query endpoints in the background to verify the API's runtime status.
-* *"i need to deploy and host it online"* — Triggered the discussion on VPS hosting vs PaaS (Render) and the necessary OpenAI API code migration.
-* *"i want this procedures in the given image to be satisfied during the upload of the project"* — Provided the final checklist of academic requirements, triggering test suite creation and documentation additions.
