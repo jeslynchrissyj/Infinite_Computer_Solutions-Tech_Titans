@@ -209,9 +209,46 @@ All settings are in `appsettings.json`:
 
 ## Adding Your Own Documents
 
-1. Place `.md` files in the `Documents/` folder
-2. Restart the application
-3. Documents are automatically loaded, chunked, embedded, and indexed
+You can add documents to the RAG knowledge base using two methods:
+
+### Method A: Dynamic Upload (via API Endpoint)
+Upload a Markdown file dynamically without restarting the application:
+
+* **Local:**
+  ```bash
+  curl -X POST "http://localhost:5000/documents?chunkSize=500&chunkOverlap=50" \
+    -H "Content-Type: multipart/form-data" \
+    -F "file=@security-policy.md"
+  ```
+* **Render (Live):**
+  ```bash
+  curl -X POST "https://rag-chat-api-dotnet.onrender.com/documents?chunkSize=500&chunkOverlap=50" \
+    -H "Content-Type: multipart/form-data" \
+    -F "file=@security-policy.md"
+  ```
+
+Or use the interactive upload option directly under the `/documents` route in **Swagger UI**.
+
+### Method B: Startup Load (Static Folder)
+1. Place `.md` files in the `Documents/` folder.
+2. Start or restart the application.
+3. Chunks are automatically loaded, chunked, embedded, and indexed on startup.
+
+---
+
+## Inspecting Indexed Chunks
+To view all chunks currently loaded in the database, call:
+
+* **Local:**
+  ```bash
+  curl http://localhost:5000/documents
+  ```
+* **Render (Live):**
+  ```bash
+  curl https://rag-chat-api-dotnet.onrender.com/documents
+  ```
+
+This returns a list of indexed chunks with their metadata: source file, chunk index, text length, embedding dimensions, and snippet preview.
 
 ---
 
