@@ -175,8 +175,8 @@ app.MapPost("/chat", async (ChatRequest request, RagService ragService, ILogger<
 
     try
     {
-        logger.LogInformation("Received chat request: '{Question}'", request.Question);
-        var response = await ragService.AskAsync(request.Question, cancellationToken);
+        logger.LogInformation("Received chat request: '{Question}' (TopK: {TopK})", request.Question, request.TopK);
+        var response = await ragService.AskAsync(request.Question, request.TopK, cancellationToken);
         return Results.Ok(response);
     }
     catch (HttpRequestException ex)
@@ -218,6 +218,8 @@ app.MapPost("/chat", async (ChatRequest request, RagService ragService, ILogger<
 // Endpoint to upload and index a new Markdown document dynamically.
 app.MapPost("/documents", async (
     IFormFile file,
+    int? chunkSize,
+    int? chunkOverlap,
     TextChunkingService textChunker,
     IEmbeddingService embeddingService,
     VectorStoreService vectorStore,
@@ -248,8 +250,8 @@ app.MapPost("/documents", async (
             return Results.BadRequest(new { Error = "The uploaded file does not contain any readable text after parsing." });
         }
 
-        // Segment the text into chunks
-        var textChunks = textChunker.SplitText(plainText);
+        // Segment the text into chunks using custom parameters if provided
+        var textChunks = textChunker.SplitText(plainText, chunkSize, chunkOverlap);
         if (textChunks.Count == 0)
         {
             return Results.BadRequest(new { Error = "Could not split the document into valid text chunks." });

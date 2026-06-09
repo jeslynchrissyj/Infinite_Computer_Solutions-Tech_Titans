@@ -26,24 +26,32 @@ public sealed class TextChunkingService
     public sealed record TextChunk(string Content, int Index);
 
     /// <summary>
-    /// Splits the input text into overlapping chunks of approximately <c>ChunkSize</c> characters.
+    /// Splits the input text into overlapping chunks of approximately the specified size.
     /// Prefers to split at paragraph or sentence boundaries when possible.
     /// </summary>
     /// <param name="text">The plain text to split.</param>
+    /// <param name="customChunkSize">Optional dynamic chunk character size limit override.</param>
+    /// <param name="customChunkOverlap">Optional dynamic overlap character size override.</param>
     /// <returns>An ordered list of text chunks with their indices.</returns>
-    public List<TextChunk> SplitText(string text)
+    public List<TextChunk> SplitText(string text, int? customChunkSize = null, int? customChunkOverlap = null)
     {
         if (string.IsNullOrWhiteSpace(text))
             return new List<TextChunk>();
 
+        var size = customChunkSize ?? _chunkSize;
+        var overlap = customChunkOverlap ?? _chunkOverlap;
+
+        if (overlap >= size)
+            throw new ArgumentException("ChunkOverlap must be less than ChunkSize.");
+
         var chunks = new List<TextChunk>();
-        var stepSize = _chunkSize - _chunkOverlap;
+        var stepSize = size - overlap;
         var textLength = text.Length;
         var chunkIndex = 0;
 
         for (var start = 0; start < textLength; start += stepSize)
         {
-            var end = Math.Min(start + _chunkSize, textLength);
+            var end = Math.Min(start + size, textLength);
             var chunkText = text[start..end];
 
             // If this is not the last chunk, try to find a clean break point
@@ -53,8 +61,6 @@ public sealed class TextChunkingService
                 if (breakPoint > 0)
                 {
                     chunkText = chunkText[..breakPoint];
-                    // Adjust the next start position so that overlap is maintained
-                    // relative to the actual break point, not the full chunk size
                 }
             }
 
@@ -67,7 +73,7 @@ public sealed class TextChunkingService
 
         _logger.LogDebug("Split text of {Length} characters into {Count} chunk(s) " +
                           "(size={ChunkSize}, overlap={Overlap})",
-            textLength, chunks.Count, _chunkSize, _chunkOverlap);
+            textLength, chunks.Count, size, overlap);
 
         return chunks;
     }

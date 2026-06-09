@@ -50,19 +50,21 @@ public sealed class RagService
     /// Processes a user question through the full RAG pipeline and returns a contextual answer.
     /// </summary>
     /// <param name="question">The user's natural-language question.</param>
+    /// <param name="topKOverride">Optional override for the number of chunks to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A <see cref="ChatResponse"/> with the answer and source documents.</returns>
-    public async Task<ChatResponse> AskAsync(string question, CancellationToken cancellationToken = default)
+    public async Task<ChatResponse> AskAsync(string question, int? topKOverride = null, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Processing RAG query: '{Question}'", question);
+        _logger.LogInformation("Processing RAG query: '{Question}' (topKOverride={TopK})", question, topKOverride);
 
         // Step 1: Generate embedding for the user's question
         _logger.LogDebug("Step 1/4: Generating query embedding...");
         var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(question, cancellationToken);
 
         // Step 2: Search the vector store for relevant chunks
-        _logger.LogDebug("Step 2/4: Searching vector store for top-{K} results...", _topK);
-        var searchResults = _vectorStore.Search(queryEmbedding, _topK);
+        var k = topKOverride ?? _topK;
+        _logger.LogDebug("Step 2/4: Searching vector store for top-{K} results...", k);
+        var searchResults = _vectorStore.Search(queryEmbedding, k);
 
         if (searchResults.Count == 0)
         {
