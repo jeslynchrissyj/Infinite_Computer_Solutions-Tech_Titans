@@ -215,6 +215,130 @@ app.MapPost("/chat", async (ChatRequest request, RagService ragService, ILogger<
 .Produces(400)
 .Produces(502);
 
+// Endpoint to upload and index a new Markdown document dynamically.
+app.MapPost("/documents", async (
+    IFormFile file,
+    TextChunkingService textChunker,
+    IEmbeddingService embeddingService,
+    VectorStoreService vectorStore,
+    IConfiguration config,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+{
+    if (file == null || file.Length == 0)
+    {
+        return Results.BadRequest(new { Error = "No file uploaded or file is empty." });
+    }
+
+    if (!Path.GetExtension(file.FileName).Equals(".md", StringComparison.OrdinalIgnoreCase))
+    {
+        return Results.BadRequest(new { Error = "Only Markdown (.md) files are supported." });
+    }
+
+    try
+    {
+        var fileName = Path.GetFileName(file.FileName);
+        using var reader = new StreamReader(file.OpenReadStream());
+        var markdown = await reader.ReadToEndAsync(cancellationToken);
+
+        // Convert Markdown to plain text
+        var plainText = DocumentLoaderService.ConvertMarkdownToPlainText(markdown);
+        if (string.IsNullOrWhiteSpace(plainText))
+        {
+            return Results.BadRequest(new { Error = "The uploaded file does not contain any readable text after parsing." });
+        }
+
+        // Segment the text into chunks
+        var textChunks = textChunker.SplitText(plainText);
+        if (textChunks.Count == 0)
+        {
+            return Results.BadRequest(new { Error = "Could not split the document into valid text chunks." });
+        }
+
+        // Save the document to local disk for persistence
+        var relativePath = config["Rag:DocumentsPath"] ?? "Documents";
+        var documentsFolder = Path.GetFullPath(relativePath);
+        if (!Directory.Exists(documentsFolder))
+        {
+            Directory.CreateDirectory(documentsFolder);
+        }
+        var filePath = Path.Combine(documentsFolder, fileName);
+        await File.WriteAllTextAsync(filePath, markdown, cancellationToken);
+
+        // Generate embeddings and index chunks
+        var indexedCount = 0;
+        foreach (var tc in textChunks)
+        {
+            var chunk = new DocumentChunk
+            {
+                Content = tc.Content,
+                Source = fileName,
+                ChunkIndex = tc.Index
+            };
+            chunk.Embedding = await embeddingService.GenerateEmbeddingAsync(chunk.Content, cancellationToken);
+            vectorStore.AddChunk(chunk);
+            indexedCount++;
+        }
+
+        logger.LogInformation("Successfully uploaded and indexed document '{File}' with {Count} chunks.", fileName, indexedCount);
+
+        return Results.Ok(new
+        {
+            Message = "Document uploaded and indexed successfully.",
+            FileName = fileName,
+            ChunksIndexed = indexedCount
+        });
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to upload and index document.");
+        return Results.Problem(
+            title: "Upload Failed",
+            detail: ex.Message,
+            statusCode: 500);
+    }
+})
+.WithName("UploadDocument")
+.WithTags("RAG")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "Upload a Markdown document";
+    operation.Description = "Upload a Markdown (.md) file to the RAG knowledge base. The API will save, chunk, embed, and index it dynamically.";
+    return operation;
+})
+.DisableAntiforgery()
+.Produces(200)
+.Produces(400)
+.Produces(500);
+
+// Endpoint to list all document chunks currently stored in the in-memory vector database.
+app.MapGet("/documents", (VectorStoreService vectorStore) =>
+{
+    var chunks = vectorStore.GetAllChunks().Select(c => new
+    {
+        c.Source,
+        c.ChunkIndex,
+        TextLength = c.Content.Length,
+        EmbeddingLength = c.Embedding?.Length ?? 0,
+        Preview = c.Content.Length > 150 ? c.Content.Substring(0, 150) + "..." : c.Content
+    }).OrderBy(c => c.Source).ThenBy(c => c.ChunkIndex).ToList();
+
+    return Results.Ok(new
+    {
+        TotalChunks = chunks.Count,
+        Chunks = chunks
+    });
+})
+.WithName("GetDocuments")
+.WithTags("RAG")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "List all indexed chunks";
+    operation.Description = "Returns a summary and metadata of all document chunks currently loaded in the in-memory vector store.";
+    return operation;
+})
+.Produces(200);
+
 // Redirect root URL to Swagger UI
 app.MapGet("/", (HttpContext context) =>
 {

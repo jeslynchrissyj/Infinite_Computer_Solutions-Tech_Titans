@@ -75,6 +75,11 @@ public sealed class VectorStoreService
     }
 
     /// <summary>
+    /// Returns all document chunks currently stored in the vector store.
+    /// </summary>
+    public IEnumerable<DocumentChunk> GetAllChunks() => _chunks;
+
+    /// <summary>
     /// Clears all stored chunks and embeddings.
     /// </summary>
     public void Clear()

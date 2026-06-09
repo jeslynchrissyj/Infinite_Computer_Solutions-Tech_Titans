@@ -72,7 +72,8 @@ public sealed class RagService
                 Question = question,
                 Answer = "I couldn't find any relevant documents to answer your question. " +
                           "Please make sure the knowledge base has been loaded.",
-                Sources = new List<string>()
+                Sources = new List<string>(),
+                SourceDetails = new List<SearchResultDetail>()
             };
         }
 
@@ -100,11 +101,22 @@ public sealed class RagService
         _logger.LogInformation("RAG query completed. Sources: [{Sources}]",
             string.Join(", ", sources));
 
+        var sourceDetails = searchResults.Select(r => new SearchResultDetail
+        {
+            Source = r.Chunk.Source,
+            ChunkIndex = r.Chunk.ChunkIndex,
+            Score = r.Score,
+            Preview = r.Chunk.Content.Length > 200 
+                ? r.Chunk.Content.Substring(0, 200) + "..." 
+                : r.Chunk.Content
+        }).ToList();
+
         return new ChatResponse
         {
             Question = question,
             Answer = answer,
-            Sources = sources
+            Sources = sources,
+            SourceDetails = sourceDetails
         };
     }
 

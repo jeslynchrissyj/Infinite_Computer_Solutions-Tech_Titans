@@ -75,7 +75,7 @@ public sealed class DocumentLoaderService
     /// Converts Markdown to plain text by rendering to HTML and then stripping tags.
     /// This preserves the logical text content while removing all formatting.
     /// </summary>
-    private static string ConvertMarkdownToPlainText(string markdown)
+    public static string ConvertMarkdownToPlainText(string markdown)
     {
         // Build a Markdig pipeline that handles common Markdown extensions
         var pipeline = new MarkdownPipelineBuilder()
