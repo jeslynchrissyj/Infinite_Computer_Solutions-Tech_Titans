@@ -1,9 +1,9 @@
 # 🎥 Project Demo Video
 
-The interactive walkthrough and demonstration of the **RAG Chat API** project has been recorded and is hosted on Google Drive.
+The interactive walkthrough and demonstration of the **RAG Chat API** project has been recorded and is hosted on GitHub Pages.
 
 ### 🌐 Demo Video Link
-👉 **[Google Drive Demo Video](https://drive.google.com/drive/folders/1qTjh4l2N7K1RlY7CtfEiKxtvExsQBScW?usp=drive_link)**
+👉 **[GitHub Pages Demo Video](https://jeslynchrissyj.github.io/RAG-Chat-App-demo-video-/)**
 
 ---
 
